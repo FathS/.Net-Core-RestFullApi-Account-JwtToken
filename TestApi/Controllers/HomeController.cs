@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -125,6 +127,40 @@ namespace TestApi.Controllers
             _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             _db.SaveChanges();
             return Ok(user);
+        }
+
+        [HttpPost]
+        public IActionResult Login([FromBody] loginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
+                if (login == null)
+                {
+                    return BadRequest();
+                }
+                return Json(login);
+            }
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public IActionResult Register([FromBody] Account model)
+        {
+
+            var account = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
+            if (ModelState.IsValid)
+            {
+                if (account.Email == model.Email)
+                {
+                    return BadRequest();
+                }
+
+                _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _db.SaveChanges();
+                return Json(model);
+            }
+            return NotFound();
         }
 
     }

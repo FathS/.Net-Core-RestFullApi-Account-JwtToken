@@ -19,6 +19,29 @@ namespace TestApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("TestApi.Models.Data.Entities.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Age");
+
+                    b.Property<string>("ConfirPassword");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Password");
+
+                    b.Property<string>("Surname");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Account");
+                });
+
             modelBuilder.Entity("TestApi.Models.Data.Entities.City", b =>
                 {
                     b.Property<int>("Id")

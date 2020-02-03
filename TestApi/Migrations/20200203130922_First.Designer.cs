@@ -10,8 +10,8 @@ using TestApi.Models.Data;
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    [Migration("20200115061254_two")]
-    partial class two
+    [Migration("20200203130922_First")]
+    partial class First
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,29 @@ namespace TestApi.Migrations
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("TestApi.Models.Data.Entities.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Age");
+
+                    b.Property<string>("ConfirPassword");
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Password");
+
+                    b.Property<string>("Surname");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Account");
+                });
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.City", b =>
                 {
@@ -64,6 +87,10 @@ namespace TestApi.Migrations
                     b.Property<string>("Department");
 
                     b.Property<string>("Gender");
+
+                    b.Property<string>("Image");
+
+                    b.Property<bool?>("IsActive");
 
                     b.Property<int?>("ManagerId");
 

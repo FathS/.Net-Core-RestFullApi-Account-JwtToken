@@ -8,6 +8,7 @@ namespace TestApi.Models.Data
         DbSet<Users> Users { get; set; }
         DbSet<City> City { get; set; }
         DbSet<Manager> Manager { get; set; }
+        DbSet<Account> Account { get; set; }
         public PersonelContext(DbContextOptions<PersonelContext> option) : base(option)
         {
 

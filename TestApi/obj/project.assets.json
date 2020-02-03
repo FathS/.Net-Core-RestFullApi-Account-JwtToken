@@ -12336,11 +12336,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj",
+      "projectUniqueName": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj",
       "projectName": "TestApi",
-      "projectPath": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj",
+      "projectPath": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj",
       "packagesPath": "C:\\Users\\is97788\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\obj\\",
+      "outputPath": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
