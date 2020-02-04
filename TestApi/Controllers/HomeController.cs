@@ -129,20 +129,7 @@ namespace TestApi.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        public IActionResult Login([FromBody] loginModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
-                if (login == null)
-                {
-                    return BadRequest();
-                }
-                return Json(login);
-            }
-            return BadRequest();
-        }
+
 
         [HttpPost]
         public IActionResult Register([FromBody] Account model)
@@ -159,11 +146,47 @@ namespace TestApi.Controllers
 
             if (ModelState.IsValid)
             {
-                _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                _db.SaveChanges();
-                return Json(model);
+                if (model.Password == model.ConfirPassword)
+                {
+                    _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    _db.SaveChanges();
+                    return Json(model);
+                }
             }
             return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult Login([FromBody] loginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
+                
+
+                if (login == null)
+                {
+                    return BadRequest();
+                }
+                return Json(login);
+            }
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public IActionResult ChangePassword([FromBody] changePassModel model)
+        {
+            var ps = _db.Set<Account>().FirstOrDefault(x => x.Id == model.id);
+
+            if (ps.Password == model.oldPassword)
+            {
+                ps.Password = model.password;
+                ps.ConfirPassword = model.confirPassword;
+                _db.SaveChanges();
+                return Ok();
+            }
+            return BadRequest();
+
         }
     }
 }
