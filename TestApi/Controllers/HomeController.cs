@@ -147,21 +147,23 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] Account model)
         {
+            var test = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
 
-            var account = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
-            if (ModelState.IsValid)
+            if (test != null)
             {
-                if (account.Email == model.Email)
+                if (test.Email == model.Email)
                 {
                     return BadRequest();
                 }
+            }
 
+            if (ModelState.IsValid)
+            {
                 _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                 _db.SaveChanges();
                 return Json(model);
             }
             return NotFound();
         }
-
     }
 }
