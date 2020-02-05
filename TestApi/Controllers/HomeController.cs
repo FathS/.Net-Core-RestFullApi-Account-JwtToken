@@ -15,12 +15,12 @@ using TestApi.Models.Data.Entities;
 
 namespace TestApi.Controllers
 {
-    
+
     public class HomeController : Controller
     {
         private readonly PersonelContext _db;
         private readonly Users _user;
-        private  IConfiguration _config;
+        private IConfiguration _config;
         public HomeController(PersonelContext db, Users user, IConfiguration config)
         {
             _db = db;
@@ -144,7 +144,7 @@ namespace TestApi.Controllers
             {
                 if (test.Email == model.Email)
                 {
-                    return BadRequest();
+                    return BadRequest("Hatalı İşlem");
                 }
             }
 
@@ -164,19 +164,19 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] loginModel model)
         {
-            IActionResult response = Unauthorized();
+            //IActionResult response = Unauthorized();
             if (ModelState.IsValid)
             {
                 var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
 
                 if (login == null)
                 {
-                    return BadRequest();
+                    return BadRequest("Kullanıcı adı veya şifre hatalı");
                 }
-                var tokenString = GenerateJSONWebToken(model);
-                response = Ok(new { token = tokenString });
+                //var tokenString = GenerateJSONWebToken(model);
+                //response = Ok(new { token = tokenString });
 
-                return Json(response);
+                return Json(login);
             }
             return BadRequest();
         }
