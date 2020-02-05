@@ -15,7 +15,7 @@ using TestApi.Models.Data.Entities;
 
 namespace TestApi.Controllers
 {
-
+    
     public class HomeController : Controller
     {
         private readonly PersonelContext _db;
@@ -55,6 +55,7 @@ namespace TestApi.Controllers
 
             return Json(manager);
         }
+        
         public IActionResult Index()
         {
             //Users user = new Users
@@ -160,7 +161,6 @@ namespace TestApi.Controllers
             return NotFound();
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public IActionResult Login([FromBody] loginModel model)
         {
@@ -173,10 +173,20 @@ namespace TestApi.Controllers
                 {
                     return BadRequest("Kullanıcı adı veya şifre hatalı");
                 }
-                //var tokenString = GenerateJSONWebToken(model);
+
+                var tokenString = GenerateJSONWebToken(model);
+
+                var loginApi = new LoginApiModel
+                {
+                    id = login.Id,
+                    name = login.Name,
+                    surname = login.Surname,
+                    token = tokenString
+                };
+                
                 //response = Ok(new { token = tokenString });
 
-                return Json(login);
+                return Json(loginApi);
             }
             return BadRequest();
         }
@@ -188,7 +198,7 @@ namespace TestApi.Controllers
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
               null,
-              expires: DateTime.Now.AddSeconds(50),
+              expires: DateTime.Now.AddMinutes(40),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
