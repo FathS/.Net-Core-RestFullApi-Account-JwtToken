@@ -1,27 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using TestApi.DTO;
 using TestApi.Models.Data;
 using TestApi.Models.Data.Entities;
 
 namespace TestApi.Controllers
 {
-
+    
     public class HomeController : Controller
     {
         private readonly PersonelContext _db;
         private readonly Users _user;
-        public HomeController(PersonelContext db, Users user)
+        private  IConfiguration _config;
+        public HomeController(PersonelContext db, Users user, IConfiguration config)
         {
             _db = db;
             _user = user;
+            _config = config;
         }
 
 
@@ -156,21 +160,38 @@ namespace TestApi.Controllers
             return NotFound();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult Login([FromBody] loginModel model)
         {
+            IActionResult response = Unauthorized();
             if (ModelState.IsValid)
             {
                 var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
-                
 
                 if (login == null)
                 {
                     return BadRequest();
                 }
-                return Json(login);
+                var tokenString = GenerateJSONWebToken(model);
+                response = Ok(new { token = tokenString });
+
+                return Json(response);
             }
             return BadRequest();
+        }
+        private string GenerateJSONWebToken(loginModel model)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+              _config["Jwt:Issuer"],
+              null,
+              expires: DateTime.Now.AddSeconds(50),
+              signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         [HttpPost]
