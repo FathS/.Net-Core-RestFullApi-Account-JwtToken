@@ -55,7 +55,7 @@ namespace TestApi.Controllers
 
             return Json(manager);
         }
-        
+
         public IActionResult Index()
         {
             //Users user = new Users
@@ -155,7 +155,7 @@ namespace TestApi.Controllers
                 {
                     _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                     _db.SaveChanges();
-                    return Json(model);
+                    return Json("Kayıt İşlemi Başarılı");
                 }
             }
             return NotFound();
@@ -183,22 +183,49 @@ namespace TestApi.Controllers
                     surname = login.Surname,
                     token = tokenString
                 };
-                
+
                 //response = Ok(new { token = tokenString });
 
                 return Json(loginApi);
             }
             return BadRequest();
         }
+        //private string GetToken(loginModel model)
+        //{
+        //    Claim[] claims;
+
+        //    claims = new[]
+        //    {
+        //            new Claim(JwtRegisteredClaimNames.Sub, model.email),
+        //            new Claim(JwtRegisteredClaimNames.Sub, model.password)
+        //    };
+
+        //    var key = new SymmetricSecurityKey(Convert.FromBase64String(_config["Authentication:JwtKey"]));
+
+        //    var token = new JwtSecurityToken(
+        //        claims: claims,
+        //        expires: DateTime.UtcNow.AddDays(1),//1 day will be valid.
+        //        signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+        //    );
+        //    return new JwtSecurityTokenHandler().WriteToken(token);
+        //}
         private string GenerateJSONWebToken(loginModel model)
         {
+            Claim[] claims;
+
+            claims = new[]
+            {
+                    new Claim(JwtRegisteredClaimNames.Sub, model.email),
+                    new Claim(JwtRegisteredClaimNames.Sub, model.password)
+            };
+
+
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
-              null,
-              expires: DateTime.Now.AddMinutes(40),
+            var token = new JwtSecurityToken(
+              claims: claims,
+              expires: DateTime.Now.AddDays(1),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
