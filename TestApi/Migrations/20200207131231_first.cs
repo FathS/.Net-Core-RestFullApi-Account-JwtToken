@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TestApi.Migrations
 {
-    public partial class First : Migration
+    public partial class first : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,14 +12,16 @@ namespace TestApi.Migrations
                 name: "Account",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Surname = table.Column<string>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     Age = table.Column<string>(nullable: true),
                     Password = table.Column<string>(nullable: true),
-                    ConfirPassword = table.Column<string>(nullable: true)
+                    ConfirPassword = table.Column<string>(nullable: true),
+                    isActive = table.Column<bool>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: true),
+                    ChangePassTime = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,6 +54,22 @@ namespace TestApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Manager", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPassword",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    UserId = table.Column<Guid>(nullable: false),
+                    Password = table.Column<string>(nullable: true),
+                    ConfirmPassword = table.Column<string>(nullable: true),
+                    CreatedPassword = table.Column<DateTime>(nullable: false),
+                    ChangedPassword = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPassword", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,6 +120,9 @@ namespace TestApi.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Account");
+
+            migrationBuilder.DropTable(
+                name: "UserPassword");
 
             migrationBuilder.DropTable(
                 name: "Users");

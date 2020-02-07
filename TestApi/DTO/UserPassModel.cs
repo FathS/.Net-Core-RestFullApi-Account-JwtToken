@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 
 namespace TestApi.DTO
 {
-    public class changePassModel
+    public class UserPassModel
     {
-        public Guid id { get; set; }
-        public string oldPassword { get; set; }
+        public int userId { get; set; }
         public string password { get; set; }
-        public string confirPassword { get; set; }
-        
+        public string confirmPassword { get; set; }
     }
 }

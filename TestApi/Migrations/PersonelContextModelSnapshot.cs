@@ -21,9 +21,8 @@ namespace TestApi.Migrations
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Account", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Age");
 
@@ -76,6 +75,26 @@ namespace TestApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Manager");
+                });
+
+            modelBuilder.Entity("TestApi.Models.Data.Entities.UserPassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("ActivePassword");
+
+                    b.Property<string>("ConfirmPassword");
+
+                    b.Property<DateTime>("CreatedPassword");
+
+                    b.Property<string>("Password");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPassword");
                 });
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Users", b =>

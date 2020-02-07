@@ -10,8 +10,8 @@ using TestApi.Models.Data;
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    [Migration("20200203130922_First")]
-    partial class First
+    [Migration("20200207133509_uspasschanged")]
+    partial class uspasschanged
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,13 +23,16 @@ namespace TestApi.Migrations
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Account", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Age");
 
+                    b.Property<DateTime?>("ChangePassTime");
+
                     b.Property<string>("ConfirPassword");
+
+                    b.Property<DateTime?>("CreateTime");
 
                     b.Property<string>("Email");
 
@@ -38,6 +41,8 @@ namespace TestApi.Migrations
                     b.Property<string>("Password");
 
                     b.Property<string>("Surname");
+
+                    b.Property<bool?>("isActive");
 
                     b.HasKey("Id");
 
@@ -72,6 +77,26 @@ namespace TestApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Manager");
+                });
+
+            modelBuilder.Entity("TestApi.Models.Data.Entities.UserPassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("ActivePassword");
+
+                    b.Property<string>("ConfirmPassword");
+
+                    b.Property<DateTime>("CreatedPassword");
+
+                    b.Property<string>("Password");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPassword");
                 });
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Users", b =>

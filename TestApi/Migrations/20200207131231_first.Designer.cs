@@ -10,8 +10,8 @@ using TestApi.Models.Data;
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    [Migration("20200207120244_AccountChanged")]
-    partial class AccountChanged
+    [Migration("20200207131231_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,9 +23,8 @@ namespace TestApi.Migrations
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Account", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Age");
 
@@ -78,6 +77,26 @@ namespace TestApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Manager");
+                });
+
+            modelBuilder.Entity("TestApi.Models.Data.Entities.UserPassword", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("ChangedPassword");
+
+                    b.Property<string>("ConfirmPassword");
+
+                    b.Property<DateTime>("CreatedPassword");
+
+                    b.Property<string>("Password");
+
+                    b.Property<Guid>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPassword");
                 });
 
             modelBuilder.Entity("TestApi.Models.Data.Entities.Users", b =>

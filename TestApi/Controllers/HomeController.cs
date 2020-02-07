@@ -134,10 +134,32 @@ namespace TestApi.Controllers
             return Ok(user);
         }
 
+        public IActionResult CreatePassword(Guid UserId, string Password, string ConfirmPassword)
+        {
 
+            if (ModelState.IsValid)
+            {
+                var pass = new UserPassword
+                {
+                    UserId = UserId,
+                    Password = Password,
+                    ConfirmPassword = ConfirmPassword,
+                    ActivePassword = true
+                };
+                if (Password == ConfirmPassword)
+                {
+                    _db.Entry(pass).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    _db.SaveChanges();
+                    return Json(pass);
+                }
+                return BadRequest("Şifreler Eşleşmedi");
+            }
+
+            return BadRequest("Parola Oluşturulamadı");
+        }
 
         [HttpPost]
-        public IActionResult Register([FromBody] Account model)
+        public IActionResult Register([FromBody] registerModel model)
         {
             var message = "Kayıt İşlemi Başarılı";
             var test = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
@@ -150,15 +172,31 @@ namespace TestApi.Controllers
                 }
             }
 
+
             if (ModelState.IsValid)
             {
-                if (model.Password == model.ConfirPassword)
+                var user = new Account
                 {
-                    model.isActive = true;
-                    _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                    _db.SaveChanges();
-                    return Json(message);
-                }
+                    Id = Guid.NewGuid(),
+                    Surname = model.Surname,
+                    Age = model.Age,
+                    CreateTime = DateTime.Now,
+                    Email = model.Email,
+                    isActive = true,
+                };
+
+                _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                CreatePassword(user.Id, model.Password, model.ConfirPassword);
+                _db.SaveChanges();
+                return Json(message);
+
+                //if (model.Password == model.ConfirPassword)
+                //{
+                //    model.isActive = true;
+                //    _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                //    _db.SaveChanges();
+                //    return Json(message);
+                //}
             }
             return NotFound();
         }
@@ -167,7 +205,7 @@ namespace TestApi.Controllers
 
         public IActionResult Login([FromBody] loginModel model)
         {
-            string message = "Kullanıcı adı veya şifre hatalı";
+            string message = "Email Adresi hatalı veya kayıtlı değil";
             if (string.IsNullOrEmpty(model.email))
             {
                 return BadRequest("Kullanıcı Adı Boş Bırakılamaz");
@@ -178,17 +216,21 @@ namespace TestApi.Controllers
             }
             if (ModelState.IsValid)
             {
-                var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
-                
+                var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email);
+                var pass = _db.Set<UserPassword>().FirstOrDefault(x => x.Password == model.password && x.ActivePassword);
 
-                if (login.isActive == null)
+
+                if (pass == null)
                 {
-                    return BadRequest("Kullanıcı Aktif Değildir.");
+                    return BadRequest("Parola Hatalı");
                 }
-
                 if (login == null)
                 {
                     return BadRequest(message);
+                }
+                if (login.isActive != true)
+                {
+                    return BadRequest("Kullanıcı Aktif Değildir.");
                 }
 
                 var tokenString = GenerateJSONWebToken(model);
@@ -253,14 +295,16 @@ namespace TestApi.Controllers
             {
                 return BadRequest("Parolanız Eşleşmedi!");
             }
-            var ps = _db.Set<Account>().FirstOrDefault(x => x.Id == model.id);
+            var ps = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == model.id);
 
             if (ps.Password == model.oldPassword)
             {
-                ps.Password = model.password;
-                ps.ConfirPassword = model.confirPassword;
-                ps.ChangePassTime = DateTime.Now;
-                _db.SaveChanges();
+                ps.ActivePassword = false;
+                CreatePassword(model.id, model.password, model.confirPassword);
+                //ps.Password = model.password;
+                //ps.ConfirmPassword = model.confirPassword;
+                //ps.ChangedPassword = DateTime.Now;
+                //_db.SaveChanges();
                 return Ok();
             }
             return BadRequest();
