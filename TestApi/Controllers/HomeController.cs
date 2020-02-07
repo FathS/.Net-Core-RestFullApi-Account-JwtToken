@@ -295,7 +295,7 @@ namespace TestApi.Controllers
             {
                 return BadRequest("Parolanız Eşleşmedi!");
             }
-            var ps = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == model.id);
+            var ps = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == model.id && x.ActivePassword);
 
             if (ps.Password == model.oldPassword)
             {
