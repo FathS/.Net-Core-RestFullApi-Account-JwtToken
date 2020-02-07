@@ -11,5 +11,6 @@ namespace TestApi.DTO
         public string oldPassword { get; set; }
         public string password { get; set; }
         public string confirPassword { get; set; }
+        
     }
 }

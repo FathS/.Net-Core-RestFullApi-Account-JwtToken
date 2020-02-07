@@ -14,5 +14,14 @@ namespace TestApi.Models.Data.Entities
         public string Age { get; set; }
         public string Password { get; set; }
         public string ConfirPassword { get; set; }
+        public bool? isActive { get; set; }
+        public DateTime? CreateTime { get; set; }
+        public DateTime? ChangePassTime { get; set; }
+
+        public Account()
+        {
+            CreateTime = DateTime.Now;
+        }
     }
+
 }

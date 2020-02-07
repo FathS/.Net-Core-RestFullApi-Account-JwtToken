@@ -15,7 +15,7 @@ using TestApi.Models.Data.Entities;
 
 namespace TestApi.Controllers
 {
-    
+
     public class HomeController : Controller
     {
         private readonly PersonelContext _db;
@@ -139,13 +139,14 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] Account model)
         {
+            var message = "Kayıt İşlemi Başarılı";
             var test = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
 
             if (test != null)
             {
                 if (test.Email == model.Email)
                 {
-                    return BadRequest("Hatalı İşlem");
+                    return BadRequest("Aynı Mail Adresi Sistemde Bulunmaktadır. Farklı bir mail adresi ile kayıt olmayı deneyiniz");
                 }
             }
 
@@ -153,25 +154,41 @@ namespace TestApi.Controllers
             {
                 if (model.Password == model.ConfirPassword)
                 {
+                    model.isActive = true;
                     _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                     _db.SaveChanges();
-                    return Json("Kayıt İşlemi Başarılı");
+                    return Json(message);
                 }
             }
             return NotFound();
         }
 
         [HttpPost]
+
         public IActionResult Login([FromBody] loginModel model)
         {
-            //IActionResult response = Unauthorized();
+            string message = "Kullanıcı adı veya şifre hatalı";
+            if (string.IsNullOrEmpty(model.email))
+            {
+                return BadRequest("Kullanıcı Adı Boş Bırakılamaz");
+            }
+            if (string.IsNullOrEmpty(model.password))
+            {
+                return BadRequest("Parola Boş Bırakılamaz");
+            }
             if (ModelState.IsValid)
             {
                 var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email && x.Password == model.password);
+                
+
+                if (login.isActive == null)
+                {
+                    return BadRequest("Kullanıcı Aktif Değildir.");
+                }
 
                 if (login == null)
                 {
-                    return BadRequest("Kullanıcı adı veya şifre hatalı");
+                    return BadRequest(message);
                 }
 
                 var tokenString = GenerateJSONWebToken(model);
@@ -183,32 +200,10 @@ namespace TestApi.Controllers
                     surname = login.Surname,
                     token = tokenString
                 };
-
-                //response = Ok(new { token = tokenString });
-
                 return Json(loginApi);
             }
-            return BadRequest();
+            return BadRequest("Hatalı İşlem");
         }
-        //private string GetToken(loginModel model)
-        //{
-        //    Claim[] claims;
-
-        //    claims = new[]
-        //    {
-        //            new Claim(JwtRegisteredClaimNames.Sub, model.email),
-        //            new Claim(JwtRegisteredClaimNames.Sub, model.password)
-        //    };
-
-        //    var key = new SymmetricSecurityKey(Convert.FromBase64String(_config["Authentication:JwtKey"]));
-
-        //    var token = new JwtSecurityToken(
-        //        claims: claims,
-        //        expires: DateTime.UtcNow.AddDays(1),//1 day will be valid.
-        //        signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-        //    );
-        //    return new JwtSecurityTokenHandler().WriteToken(token);
-        //}
         private string GenerateJSONWebToken(loginModel model)
         {
             Claim[] claims;
@@ -225,7 +220,7 @@ namespace TestApi.Controllers
 
             var token = new JwtSecurityToken(
               claims: claims,
-              expires: DateTime.Now.AddDays(1),
+              expires: DateTime.Now.AddMinutes(1),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -234,12 +229,37 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult ChangePassword([FromBody] changePassModel model)
         {
+            if (model.id == null)
+            {
+                return BadRequest("Geçerli Kullanıcı Bulunamadı!");
+            }
+            if (string.IsNullOrEmpty(model.oldPassword))
+            {
+                return BadRequest("Lütfen Eski Parolanızı Giriniz.");
+            }
+            if (string.IsNullOrEmpty(model.password))
+            {
+                return BadRequest("Lütfen Parola Belirleyiniz.");
+            }
+            if (model.password.Length < 8)
+            {
+                return BadRequest("Parolanız En Az 8 Haneli Olmak Zorundadır.");
+            }
+            if (string.IsNullOrEmpty(model.confirPassword))
+            {
+                return BadRequest("Lütfen Parolanızı Tekrar Giriniz.");
+            }
+            if (model.password != model.confirPassword)
+            {
+                return BadRequest("Parolanız Eşleşmedi!");
+            }
             var ps = _db.Set<Account>().FirstOrDefault(x => x.Id == model.id);
 
             if (ps.Password == model.oldPassword)
             {
                 ps.Password = model.password;
                 ps.ConfirPassword = model.confirPassword;
+                ps.ChangePassTime = DateTime.Now;
                 _db.SaveChanges();
                 return Ok();
             }
