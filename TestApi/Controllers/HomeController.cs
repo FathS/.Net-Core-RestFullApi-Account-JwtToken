@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -97,8 +98,11 @@ namespace TestApi.Controllers
         {
             if (string.IsNullOrEmpty(user.name))
             {
-                user.name = "İsimsiz misin?";
-                //Hata Verdirilebilir.
+                return BadRequest("İsim Boş Bırakılamaz!");
+            }
+            if (string.IsNullOrEmpty(user.surname))
+            {
+                return BadRequest("Soyisim Boş Bırakılamaz!");
             }
             //Devam Edilebilir...
 
@@ -115,7 +119,7 @@ namespace TestApi.Controllers
 
             _db.Entry(users).State = Microsoft.EntityFrameworkCore.EntityState.Added;
             _db.SaveChanges();
-            return Json(user);
+            return Ok("Kayıt Başarılı!");
         }
         [HttpPut]
         public IActionResult Update([FromBody] Users user)
@@ -217,22 +221,26 @@ namespace TestApi.Controllers
             if (ModelState.IsValid)
             {
                 var login = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email);
-                var pass = _db.Set<UserPassword>().FirstOrDefault(x => x.Password == model.password && x.ActivePassword);
 
-
-                if (pass == null)
-                {
-                    return BadRequest("Parola Hatalı");
-                }
                 if (login == null)
                 {
                     return BadRequest(message);
                 }
-                if (login.isActive != true)
+                if ((bool)!login.isActive)
                 {
-                    return BadRequest("Kullanıcı Aktif Değildir.");
+                    return BadRequest("Hesap Aktif Değil. Aktif Etmek için Tıklayınız");
                 }
 
+                var pass = _db.Set<UserPassword>().FirstOrDefault(x => x.Password == model.password && x.ActivePassword);
+                
+                if (pass == null)
+                {
+                    return BadRequest("Parola Hatalı");
+                }
+                //if (!pass.ActivePassword)
+                //{
+                //    return BadRequest("Eski Kullandığını parolayı girdiniz. Lütfen Güncel parolanızı giriniz.");
+                //}
                 var tokenString = GenerateJSONWebToken(model);
 
                 var loginApi = new LoginApiModel
@@ -240,7 +248,7 @@ namespace TestApi.Controllers
                     id = login.Id,
                     name = login.Name,
                     surname = login.Surname,
-                    token = tokenString
+                    token = tokenString,
                 };
                 return Json(loginApi);
             }
@@ -262,11 +270,28 @@ namespace TestApi.Controllers
 
             var token = new JwtSecurityToken(
               claims: claims,
-              expires: DateTime.Now.AddMinutes(1),
+              expires: DateTime.Now.AddMinutes(185),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        //private void HashingPassword(string password)
+        //{
+        //    var rng = RandomNumberGenerator.Create();
+        //    var saltBytes = new byte[16];
+        //    rng.GetBytes(saltBytes);
+        //    var saltText = Convert.ToBase64String(saltBytes);
+
+        //    var sha = SHA256.Create();
+        //    var saltedPassord = password + saltText;
+        //    var saltedhashedPassword = Convert.ToBase64String(sha.ComputeHash(Encoding.Unicode.GetBytes(saltedPassord)));
+
+        //    var User = new UserPassword
+        //    {
+        //        Salt = saltText,
+        //        SaltedHashedPassword = saltedhashedPassword,
+        //    };
+        //}
 
         [HttpPost]
         public IActionResult ChangePassword([FromBody] changePassModel model)
@@ -308,6 +333,44 @@ namespace TestApi.Controllers
                 return Ok();
             }
             return BadRequest();
+
+        }
+        [HttpPost]
+        public IActionResult DisabledAccount([FromBody] DisabledModel model)
+        {
+            var account = _db.Set<Account>().FirstOrDefault(x => x.Id == model.id);
+
+            if (account == null)
+            {
+                return BadRequest("Hesap Bulunamadı");
+            }
+            else
+            {
+                account.isActive = model.isActive;
+                _db.SaveChanges();
+                return Ok("Hesap Devre Dışı Bırakıldı");
+            }
+            
+        }
+        [HttpPost]
+        public IActionResult ActiveAccount([FromBody] ActiveModel model)
+        {
+            var account = _db.Set<Account>().FirstOrDefault(x => x.Email == model.email);
+            if (account == null)
+            {
+                return BadRequest("Sistemde tanımlı hesap bulunamadı!");
+            }
+            var password = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == account.Id && x.Password == model.password);
+            if (password == null)
+            {
+                return BadRequest("Şifre Hatalı veya Aktif Değil!");
+            }
+            else
+            {
+                account.isActive = model.active;
+                _db.SaveChanges();
+                return Ok("Hesap Aktif Edildi.");
+            }
 
         }
     }
