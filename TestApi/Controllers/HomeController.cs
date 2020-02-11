@@ -182,11 +182,13 @@ namespace TestApi.Controllers
                 var user = new Account
                 {
                     Id = Guid.NewGuid(),
+                    Name = model.Name,
                     Surname = model.Surname,
                     Age = model.Age,
                     CreateTime = DateTime.Now,
                     Email = model.Email,
                     isActive = true,
+
                 };
 
                 _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Added;
@@ -206,7 +208,6 @@ namespace TestApi.Controllers
         }
 
         [HttpPost]
-
         public IActionResult Login([FromBody] loginModel model)
         {
             string message = "Email Adresi hatalı veya kayıtlı değil";
@@ -232,15 +233,15 @@ namespace TestApi.Controllers
                 }
 
                 var pass = _db.Set<UserPassword>().FirstOrDefault(x => x.Password == model.password && x.ActivePassword);
-                
+
                 if (pass == null)
                 {
                     return BadRequest("Parola Hatalı");
                 }
-                //if (!pass.ActivePassword)
-                //{
-                //    return BadRequest("Eski Kullandığını parolayı girdiniz. Lütfen Güncel parolanızı giriniz.");
-                //}
+                if (pass.ActivePassword != true)
+                {
+                    return BadRequest("Eski Kullandığını parolayı girdiniz. Lütfen Güncel parolanızı giriniz.");
+                }
                 var tokenString = GenerateJSONWebToken(model);
 
                 var loginApi = new LoginApiModel
@@ -322,6 +323,11 @@ namespace TestApi.Controllers
             }
             var ps = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == model.id && x.ActivePassword);
 
+            if (ps == null)
+            {
+                return BadRequest("Parola Hatalı");
+            }
+
             if (ps.Password == model.oldPassword)
             {
                 ps.ActivePassword = false;
@@ -332,7 +338,11 @@ namespace TestApi.Controllers
                 //_db.SaveChanges();
                 return Ok();
             }
-            return BadRequest();
+            else
+            {
+                return BadRequest("Eski Parolanız Hatalı");
+            }
+
 
         }
         [HttpPost]
@@ -350,7 +360,7 @@ namespace TestApi.Controllers
                 _db.SaveChanges();
                 return Ok("Hesap Devre Dışı Bırakıldı");
             }
-            
+
         }
         [HttpPost]
         public IActionResult ActiveAccount([FromBody] ActiveModel model)
