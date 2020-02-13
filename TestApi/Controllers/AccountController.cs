@@ -1,14 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TestApi.DTO;
 using TestApi.Models.Data;
@@ -16,116 +14,15 @@ using TestApi.Models.Data.Entities;
 
 namespace TestApi.Controllers
 {
-
-    public class HomeController : Controller
+    public class AccountController : Controller
     {
         private readonly PersonelContext _db;
-        private readonly Users _user;
         private IConfiguration _config;
-        public HomeController(PersonelContext db, Users user, IConfiguration config)
+        public AccountController(PersonelContext db, Users user, IConfiguration config)
         {
             _db = db;
-            _user = user;
             _config = config;
         }
-        
-        public IActionResult managerList()
-        {
-            //var cityList = _db.Set<City>().ToList();
-
-            var manager = _db.Set<Manager>().Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString(),
-                Text = x.FullName,
-
-            });
-
-            return Json(manager);
-        }
-
-        public IActionResult Index()
-        {
-            //Users user = new Users
-            //{
-            //    Id = 1,
-            //    Name = "Fatih",
-            //    Surname = "Şengül",
-            //    Department = "Yazılım",
-            //};
-
-            //List<Users> ulist = new List<Users>();
-
-            //ulist.Add(user);
-
-            //Üstteki kod DB oluşturmadan test etmek için.//
-
-
-            var uList = _db.Set<Users>().Select(x => new usersDTO
-            {
-                id = x.Id,
-                name = x.Name,
-                surname = x.Surname,
-                manager = x.Manager.FullName,
-                city = x.City.Name,
-                IsActive = x.IsActive,
-                district = x.District.Name
-            }).OrderBy(x => x.name).ToList();
-
-
-            return Ok(uList);
-        }
-        public IActionResult Get(int id)
-        {
-            var getUser = _db.Set<Users>().Find(id);
-            return Json(getUser);
-        }
-        
-        [HttpPost]
-        public IActionResult Add([FromBody] usersDTO user)
-        {
-            if (string.IsNullOrEmpty(user.name))
-            {
-                return BadRequest("İsim Boş Bırakılamaz!");
-            }
-            if (string.IsNullOrEmpty(user.surname))
-            {
-                return BadRequest("Soyisim Boş Bırakılamaz!");
-            }
-            //Devam Edilebilir...
-
-            Users users = new Users
-            {
-                Name = user.name,
-                Surname = user.surname,
-                CityId = user.cityId,
-                ManagerId = user.managerId,
-                Birthday = Convert.ToDateTime(user.birthday),
-                Gender = user.gender,
-                Department = user.department,
-                DistrictId = user.districtId
-            };
-
-            _db.Entry(users).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-            _db.SaveChanges();
-            return Ok("Kayıt Başarılı!");
-        }
-        [HttpPut]
-        public IActionResult Update([FromBody] Users user)
-        {
-            _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _db.SaveChanges();
-            return Json(user);
-        }
-
-        [HttpPost]
-        public IActionResult Delete(int id)
-        {
-            Users user = _db.Set<Users>().Find(id);
-            _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-            _db.SaveChanges();
-            return Ok(user);
-        }
-
         public IActionResult CreatePassword(Guid UserId, string Password, string ConfirmPassword)
         {
 
@@ -175,7 +72,7 @@ namespace TestApi.Controllers
                     Age = model.Age,
                     CreateTime = DateTime.Now,
                     Email = model.Email,
-                    isActive = true,
+                    isActive = model.isActive,
 
                 };
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestApi.Models.Data;
 
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    partial class PersonelContextModelSnapshot : ModelSnapshot
+    [Migration("20200213060234_District")]
+    partial class District
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,8 +128,6 @@ namespace TestApi.Migrations
 
                     b.Property<string>("Department");
 
-                    b.Property<int?>("DistrictId");
-
                     b.Property<string>("Gender");
 
                     b.Property<string>("Image");
@@ -143,8 +143,6 @@ namespace TestApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
-
-                    b.HasIndex("DistrictId");
 
                     b.HasIndex("ManagerId");
 
@@ -164,10 +162,6 @@ namespace TestApi.Migrations
                     b.HasOne("TestApi.Models.Data.Entities.City", "City")
                         .WithMany("Users")
                         .HasForeignKey("CityId");
-
-                    b.HasOne("TestApi.Models.Data.Entities.District", "District")
-                        .WithMany("User")
-                        .HasForeignKey("DistrictId");
 
                     b.HasOne("TestApi.Models.Data.Entities.Manager", "Manager")
                         .WithMany("Users")

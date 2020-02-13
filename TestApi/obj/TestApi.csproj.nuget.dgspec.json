@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj": {}
+    "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj": {
+    "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj",
+        "projectUniqueName": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj",
         "projectName": "TestApi",
-        "projectPath": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\TestApi.csproj",
+        "projectPath": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\TestApi.csproj",
         "packagesPath": "C:\\Users\\is97788\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\is97788\\Desktop\\BasicApi\\BasicApi\\TestApi\\obj\\",
+        "outputPath": "C:\\Users\\is97788\\Desktop\\testcode\\TestApi\\TestApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

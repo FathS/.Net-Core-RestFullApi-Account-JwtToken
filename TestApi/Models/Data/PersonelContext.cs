@@ -7,6 +7,7 @@ namespace TestApi.Models.Data
     {
         DbSet<Users> Users { get; set; }
         DbSet<City> City { get; set; }
+        DbSet<District> District { get; set; }
         DbSet<Manager> Manager { get; set; }
         DbSet<Account> Account { get; set; }
         DbSet<UserPassword> UserPassword { get; set; }

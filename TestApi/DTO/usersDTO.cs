@@ -12,9 +12,11 @@ namespace TestApi.DTO
         public string name { get; set; }
         public string surname { get; set; }
         public string manager { get; set; }
+        public int managerId { get; set; }
         public string city { get; set; }
         public int cityId { get; set; }
-        public int managerId { get; set; }
+        public string district { get; set; }
+        public int districtId { get; set; }
         public string gender { get; set; }
         public string birthday { get; set; }
         public string department { get; set; }
