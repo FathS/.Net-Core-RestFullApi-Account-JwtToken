@@ -15,6 +15,7 @@ namespace TestApi.Models.Data.Entities
         public string Password { get; set; }
         public string ConfirPassword { get; set; }
         public bool? isActive { get; set; }
+        public string Role { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? ChangePassTime { get; set; }
 

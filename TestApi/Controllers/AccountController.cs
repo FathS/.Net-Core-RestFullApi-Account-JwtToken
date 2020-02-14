@@ -48,7 +48,7 @@ namespace TestApi.Controllers
 
             return BadRequest("Parola Oluşturulamadı");
         }
-       
+
         [HttpPost]
         public IActionResult Register([FromBody] registerModel model)
         {
@@ -103,7 +103,7 @@ namespace TestApi.Controllers
                     CreateTime = DateTime.Now,
                     Email = model.Email,
                     isActive = model.isActive,
-
+                    Role = "User"
                 };
 
                 _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Added;
@@ -164,6 +164,7 @@ namespace TestApi.Controllers
                 name = account.Name,
                 surname = account.Surname,
                 token = tokenString,
+                role = account.Role
             };
             return Json(loginApi);
 
@@ -264,11 +265,20 @@ namespace TestApi.Controllers
             {
                 return BadRequest("Hesap Bulunamadı");
             }
+
+            if (account.isActive == model.isActive)
+            {
+                return BadRequest("Hesap Zaten Seçtiğiniz Durumdadır!");
+            }
             else
             {
                 account.isActive = model.isActive;
                 _db.SaveChanges();
-                return Ok("Hesap Devre Dışı Bırakıldı");
+                if (model.isActive)
+                {
+                    return Ok("Hesap Aktif Edildi" + " " + account.Name + " " + account.Surname);
+                }
+                return Ok("Hesap Devre Dışı Bırakıldı" + " " + account.Name + " " + account.Surname);
             }
 
         }

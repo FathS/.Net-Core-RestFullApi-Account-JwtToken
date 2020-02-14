@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 
 namespace TestApi.DTO
 {
-    public class LoginApiModel
+    public class AccountModel
     {
         public Guid id { get; set; }
         public string name { get; set; }
         public string surname { get; set; }
-        public string token { get; set; }
+        public string email { get; set; }
+        public bool isActive { get; set; }
+        public DateTime createTime { get; set; }
         public string role { get; set; }
     }
 }
