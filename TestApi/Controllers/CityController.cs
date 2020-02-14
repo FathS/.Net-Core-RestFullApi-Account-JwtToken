@@ -20,23 +20,24 @@ namespace TestApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult CityAdd([FromBody]CityModel city)
+        public IActionResult CityAdd([FromBody]City city)
         {
-            if (string.IsNullOrEmpty(city.name))
+            if (string.IsNullOrEmpty(city.Name))
             {
                 return BadRequest("İsim Boş Bırakılamaz");
             }
 
-            var c = new City
-            {
-                Id = city.id,
-                Name = city.name,
-            };
+            //var c = new City
+            //{
+            //    Name = city.name,
+            //};
 
-            _db.Entry(c).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+            _db.Entry(city).State = Microsoft.EntityFrameworkCore.EntityState.Added;
             _db.SaveChanges();
-            return Ok("Kayıt Başarılı");
+            return Ok("İl Ekleme Başarılı");
         }
+
+
         public IActionResult CityList()
         {
 
@@ -44,10 +45,32 @@ namespace TestApi.Controllers
             {
                 Value = x.Id.ToString(),
                 Text = x.Name,
-
-            });
+            }).OrderBy(x => x.Text);
 
             return Ok(cities);
+        }
+
+        [HttpPost]
+        public IActionResult DistrictAdd([FromBody] District district)
+        {
+            if (string.IsNullOrEmpty(district.Name))
+            {
+                return BadRequest("İlçe İsmi Boş Bırakılamaz.");
+            }
+            if (district.CityId == null)
+            {
+                return BadRequest("Hata!");
+            }
+
+            //District dist = new District
+            //{
+            //    Name = model.name,
+            //    CityId = model.cityId
+            //};
+            _db.Entry(district).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+            _db.SaveChanges();
+
+            return Ok("İlçe Ekleme Başarılı");
         }
         public IActionResult DistrictList(int id)
         {

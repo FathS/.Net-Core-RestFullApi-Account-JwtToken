@@ -28,7 +28,7 @@ namespace TestApi.Controllers
             _user = user;
             _config = config;
         }
-        
+
         public IActionResult managerList()
         {
             //var cityList = _db.Set<City>().ToList();
@@ -79,7 +79,7 @@ namespace TestApi.Controllers
             var getUser = _db.Set<Users>().Find(id);
             return Json(getUser);
         }
-        
+
         [HttpPost]
         public IActionResult Add([FromBody] usersDTO user)
         {
@@ -153,6 +153,11 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] registerModel model)
         {
+            if (string.IsNullOrEmpty(model.Name))
+            {
+                return BadRequest("İsim Boş Bırakılamaz");
+            }
+
             var message = "Kayıt İşlemi Başarılı";
             var test = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
 
@@ -183,16 +188,8 @@ namespace TestApi.Controllers
                 CreatePassword(user.Id, model.Password, model.ConfirPassword);
                 _db.SaveChanges();
                 return Json(message);
-
-                //if (model.Password == model.ConfirPassword)
-                //{
-                //    model.isActive = true;
-                //    _db.Entry(model).State = Microsoft.EntityFrameworkCore.EntityState.Added;
-                //    _db.SaveChanges();
-                //    return Json(message);
-                //}
             }
-            return NotFound();
+            return BadRequest("Kayıt Yapılamadı!");
         }
 
         [HttpPost]

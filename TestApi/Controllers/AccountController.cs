@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using TestApi.DTO;
+using TestApi.Helpers;
 using TestApi.Models.Data;
 using TestApi.Models.Data.Entities;
 
@@ -23,6 +24,7 @@ namespace TestApi.Controllers
             _db = db;
             _config = config;
         }
+        [HttpPost]
         public IActionResult CreatePassword(Guid UserId, string Password, string ConfirmPassword)
         {
 
@@ -46,10 +48,38 @@ namespace TestApi.Controllers
 
             return BadRequest("Parola Oluşturulamadı");
         }
-
+       
         [HttpPost]
         public IActionResult Register([FromBody] registerModel model)
         {
+            if (string.IsNullOrEmpty(model.Name))
+            {
+                return BadRequest("İsim Boş Bırakılamaz");
+            }
+            if (string.IsNullOrEmpty(model.Surname))
+            {
+                return BadRequest("Soyİsim Boş Bırakılamaz");
+            }
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                return BadRequest("Email Boş Bırakılamaz");
+            }
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Parola Boş Bırakılamaz");
+            }
+            if (string.IsNullOrEmpty(model.ConfirPassword))
+            {
+                return BadRequest("Parola Tekrar Boş Bırakılamaz");
+            }
+            if (model.Password != model.ConfirPassword)
+            {
+                return BadRequest("Parola Eşleşmedi!");
+            }
+            if (!model.isActive)
+            {
+                return BadRequest("Sözleşmeyi Onaylamanız Gerekmektedir.");
+            }
             var message = "Kayıt İşlemi Başarılı";
             var test = _db.Set<Account>().FirstOrDefault(x => x.Email == model.Email);
 
@@ -89,7 +119,7 @@ namespace TestApi.Controllers
                 //    return Json(message);
                 //}
             }
-            return NotFound();
+            return BadRequest();
         }
 
         [HttpPost]
@@ -155,7 +185,7 @@ namespace TestApi.Controllers
 
             var token = new JwtSecurityToken(
               claims: claims,
-              expires: DateTime.Now.AddMinutes(185),
+              expires: DateTime.Now.AddMinutes(5),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
