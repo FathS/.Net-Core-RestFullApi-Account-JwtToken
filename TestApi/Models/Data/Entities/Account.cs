@@ -21,7 +21,7 @@ namespace TestApi.Models.Data.Entities
 
         public Account()
         {
-            CreateTime = DateTime.Now;
+            CreateTime = DateTime.Now.Date;
         }
     }
 

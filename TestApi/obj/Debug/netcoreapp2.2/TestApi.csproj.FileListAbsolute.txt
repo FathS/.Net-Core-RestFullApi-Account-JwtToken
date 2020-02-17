@@ -65,7 +65,6 @@ C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\bin\Debug\netcoreapp2.2\TestA
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\bin\Debug\netcoreapp2.2\TestApi.pdb
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\bin\Debug\netcoreapp2.2\TestApi.Views.dll
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\bin\Debug\netcoreapp2.2\TestApi.Views.pdb
-C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csprojAssemblyReference.cache
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csproj.CoreCompileInputs.cache
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.RazorAssemblyInfo.cache
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.RazorAssemblyInfo.cs
@@ -88,3 +87,4 @@ C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestA
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.dll
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.pdb
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csproj.CopyComplete
+C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csprojAssemblyReference.cache

@@ -14,5 +14,8 @@ namespace TestApi.DTO
         public string Password { get; set; }
         public string ConfirPassword { get; set; }
         public bool isActive { get; set; }
+        public string role { get; set; }
     }
+    
+    
 }

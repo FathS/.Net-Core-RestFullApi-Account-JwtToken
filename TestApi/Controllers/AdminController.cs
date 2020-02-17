@@ -27,9 +27,36 @@ namespace TestApi.Controllers
                 isActive = (bool)x.isActive,
                 createTime = (DateTime)x.CreateTime,
                 role = x.Role
-            }).ToList();
+            }).OrderBy(x=> x.role).ToList();
 
             return Json(list);
+        }
+        public IActionResult CreatePassword(Guid UserId, string Password, string ConfirmPassword)
+        {
+            //Admin Kullanıcının şifresini değiştirirse eski parolayı false yapmak için yazıldı.
+            var password = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == UserId && x.ActivePassword);
+            password.ActivePassword = false;
+            ////////////////////////////////
+
+            if (ModelState.IsValid)
+            {
+                var pass = new UserPassword
+                {
+                    UserId = UserId,
+                    Password = Password,
+                    ConfirmPassword = ConfirmPassword,
+                    ActivePassword = true
+                };
+                if (Password == ConfirmPassword)
+                {
+                    _db.Entry(pass).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                    _db.SaveChanges();
+                    return Json(pass);
+                }
+                return BadRequest("Şifreler Eşleşmedi");
+            }
+
+            return BadRequest("Parola Oluşturulamadı");
         }
 
         public IActionResult DetailAccount(Guid id)
@@ -39,9 +66,57 @@ namespace TestApi.Controllers
             {
                 return BadRequest("Hesap Bulunamadı!");
             }
+            var password = _db.Set<UserPassword>().FirstOrDefault(x => x.UserId == id && x.ActivePassword);
+            if (password == null)
+            {
+                return BadRequest("Parola Bulunamadı!");
+            }
 
+            var accountModel = new AccountModel
+            {
+                id = account.Id,
+                isActive = (bool)account.isActive,
+                name = account.Name,
+                surname = account.Surname,
+                email = account.Email,
+                role = account.Role,
+                password = password.Password,
+                age = account.Age
+            };
 
-            return Ok(account);
+            return Ok(accountModel);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateAccount([FromBody]AccountModel model)
+        {
+            var account = new Account
+            {
+                Id = model.id,
+                Name = model.name,
+                Surname = model.surname,
+                Email = model.email,
+                Age = model.age,
+                Role = model.role,
+                isActive = model.isActive
+            };
+
+            if (model.password != null && model.confirmPassword != null)
+            {
+                CreatePassword(model.id, model.password, model.confirmPassword);
+            }
+
+            _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _db.SaveChanges();
+            if (model.isActive)
+            {
+                return Ok("Kullanıcı Bilgileri Güncellendi" + " " + account.Name + " " + account.Surname + " " + "Aktifdir. ");
+            }
+            if (!model.isActive)
+            {
+                return Ok("Kullanıcı Bilgileri Güncellendi" + " " + account.Name + " " + account.Surname + " " + "Aktif Değildir. ");
+            }
+            return Ok("Kullanıcı Bilgileri Güncellendi.");
         }
 
         [HttpPost]
@@ -58,7 +133,7 @@ namespace TestApi.Controllers
             return Ok("Hesap Silindi!");
         }
         [HttpPost]
-        public IActionResult DisabledAccount(Guid id)
+        public IActionResult AccountisActive(Guid id)
         {
             var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
@@ -66,13 +141,21 @@ namespace TestApi.Controllers
             {
                 return BadRequest("Hesap Bulunamadı");
             }
-            else
+            if ((bool)account.isActive)
             {
                 account.isActive = false;
                 _db.SaveChanges();
-                return Ok("Hesap Devre Dışı Bırakıldı");
+                return Ok(account.Name + " " + " " + account.Surname + "'e Ait Hesap Devre Dışı Bırakıldı");
+            }
+            else
+            {
+                account.isActive = true;
+                _db.SaveChanges();
+                return Ok(account.Name + " " + " " + account.Surname + "'e Ait Hesap Aktif Edildi");
             }
 
         }
+
+
     }
 }

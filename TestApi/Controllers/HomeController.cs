@@ -120,6 +120,7 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
+            
             Users user = _db.Set<Users>().Find(id);
             _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             _db.SaveChanges();

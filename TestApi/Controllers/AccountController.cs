@@ -52,6 +52,7 @@ namespace TestApi.Controllers
         [HttpPost]
         public IActionResult Register([FromBody] registerModel model)
         {
+            string Defaultrole;
             if (string.IsNullOrEmpty(model.Name))
             {
                 return BadRequest("İsim Boş Bırakılamaz");
@@ -91,6 +92,14 @@ namespace TestApi.Controllers
                 }
             }
 
+            if (model.role == null)
+            {
+                Defaultrole = "User";
+            }
+            else
+            {
+                Defaultrole = model.role;
+            }
 
             if (ModelState.IsValid)
             {
@@ -98,13 +107,14 @@ namespace TestApi.Controllers
                 {
                     Id = Guid.NewGuid(),
                     Name = model.Name,
-                    Surname = model.Surname,
+                    Surname = model.Surname.ToUpperInvariant(),
                     Age = model.Age,
                     CreateTime = DateTime.Now,
                     Email = model.Email,
                     isActive = model.isActive,
-                    Role = "User"
+                    Role = Defaultrole
                 };
+
 
                 _db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                 CreatePassword(user.Id, model.Password, model.ConfirPassword);
@@ -186,7 +196,7 @@ namespace TestApi.Controllers
 
             var token = new JwtSecurityToken(
               claims: claims,
-              expires: DateTime.Now.AddMinutes(5),
+              expires: DateTime.Now.AddSeconds(15),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -256,30 +266,21 @@ namespace TestApi.Controllers
 
 
         }
+
         [HttpPost]
         public IActionResult DisabledAccount([FromBody] DisabledModel model)
         {
-            var account = _db.Set<Account>().FirstOrDefault(x => x.Id == model.id);
+            var account = _db.Set<Account>().Find(model.id);
 
             if (account == null)
             {
                 return BadRequest("Hesap Bulunamadı");
             }
 
-            if (account.isActive == model.isActive)
-            {
-                return BadRequest("Hesap Zaten Seçtiğiniz Durumdadır!");
-            }
-            else
-            {
-                account.isActive = model.isActive;
-                _db.SaveChanges();
-                if (model.isActive)
-                {
-                    return Ok("Hesap Aktif Edildi" + " " + account.Name + " " + account.Surname);
-                }
-                return Ok("Hesap Devre Dışı Bırakıldı" + " " + account.Name + " " + account.Surname);
-            }
+            account.isActive = model.isActive;
+            _db.SaveChanges();
+            return Ok("Hesabınız Dondurulmuştur.");
+
 
         }
         [HttpPost]
