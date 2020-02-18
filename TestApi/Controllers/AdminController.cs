@@ -16,20 +16,111 @@ namespace TestApi.Controllers
         {
             _db = db;
         }
-        public IActionResult AccountList()
-        {
-            var list = _db.Set<Account>().Select(x => new AccountModel
-            {
-                id = x.Id,
-                name = x.Name,
-                surname = x.Surname,
-                email = x.Email,
-                isActive = (bool)x.isActive,
-                createTime = (DateTime)x.CreateTime,
-                role = x.Role
-            }).OrderBy(x=> x.role).ToList();
+        //public IActionResult AccountList()
+        //{
+        //    var list = _db.Set<Account>().Select(x => new AccountModel
+        //    {
+        //        id = x.Id,
+        //        name = x.Name,
+        //        surname = x.Surname,
+        //        email = x.Email,
+        //        isActive = (bool)x.isActive,
+        //        createTime = (DateTime)x.CreateTime,
+        //        role = x.Role
+        //    }).OrderBy(x => x.role)/*.OrderByDescending(x=> x.name).Take(1)*/.Where(x => x.isActive).ToList();
 
-            return Json(list);
+        //    return Json(list);
+        //}
+        public IActionResult AccountList(int id)
+        {
+            if (id == 1)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderBy(x => x.role).Where(x => x.isActive).ToList();
+
+                return Json(list);
+            }
+            else if (id == 0)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderBy(x => x.role).Where(x => x.isActive == false).ToList();
+
+                return Json(list);
+            }
+            else if (id == 2)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderBy(x => x.email).ToList();
+                return Json(list);
+            }
+            else if(id == 3)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderBy(x => x.createTime).OrderByDescending(x=> x.createTime).ToList();
+                return Json(list);
+            }
+            else if(id == 4)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderBy(x => x.role).ToList();
+                return Json(list);
+            }
+            else if (id == 5)
+            {
+                var list = _db.Set<Account>().Select(x => new AccountModel
+                {
+                    id = x.Id,
+                    name = x.Name,
+                    surname = x.Surname,
+                    email = x.Email,
+                    isActive = (bool)x.isActive,
+                    createTime = (DateTime)x.CreateTime,
+                    role = x.Role
+                }).OrderByDescending(x=> x.role).ToList();
+                return Json(list);
+            }
+            return Ok();
+
         }
         public IActionResult CreatePassword(Guid UserId, string Password, string ConfirmPassword)
         {
@@ -127,6 +218,10 @@ namespace TestApi.Controllers
             if (account == null)
             {
                 return BadRequest("Hesap Bulunamadı");
+            }
+            if (account.Role == "Admin")
+            {
+                return BadRequest("Admin Hesabı Silinemez");
             }
             _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             _db.SaveChanges();
