@@ -9,5 +9,7 @@ namespace TestApi.DTO
     {
         public string dolar { get; set; }
         public string euro { get; set; }
+        public DateTime date { get; set; }
+
     }
 }

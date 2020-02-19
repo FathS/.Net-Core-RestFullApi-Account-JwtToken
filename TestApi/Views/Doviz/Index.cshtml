@@ -1,0 +1,18 @@
+﻿@model List<TestApi.DTO.dovizModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table>
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>@item.dolar</td>
+        <td>@item.euro</td>
+    </tr>
+    }
+
+</table>
+
