@@ -56,5 +56,22 @@ namespace TestApi.Controllers
             }
 
         }
+        public IActionResult CityList()
+        {
+            var HavaList = new List<havaModel>();
+            try
+            {
+                XDocument xDoc = XDocument.Load("https://www.mgm.gov.tr/FTPDATA/analiz/sonSOA.xml");
+                HavaList = xDoc.Descendants("sehirler").Select(x => new havaModel
+                {
+                    il = (string)x.Element("ili"),
+                }).ToList();
+                return Ok(HavaList);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Veri Çekilemedi");
+            }
+        }
     }
 }

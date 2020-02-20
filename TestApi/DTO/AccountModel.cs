@@ -17,5 +17,6 @@ namespace TestApi.DTO
         public DateTime createTime { get; set; }
         public string role { get; set; }
         public string age { get; set; }
+        public string image { get; set; }
     }
 }

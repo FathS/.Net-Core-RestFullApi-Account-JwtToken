@@ -43,7 +43,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = (DateTime)x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    image = x.Image
                 }).OrderBy(x => x.role).Where(x => x.isActive).ToList();
 
                 return Json(list);
@@ -77,7 +78,7 @@ namespace TestApi.Controllers
                 }).OrderBy(x => x.email).ToList();
                 return Json(list);
             }
-            else if(id == 3)
+            else if (id == 3)
             {
                 var list = _db.Set<Account>().Select(x => new AccountModel
                 {
@@ -88,10 +89,10 @@ namespace TestApi.Controllers
                     isActive = (bool)x.isActive,
                     createTime = (DateTime)x.CreateTime,
                     role = x.Role
-                }).OrderBy(x => x.createTime).OrderByDescending(x=> x.createTime).ToList();
+                }).OrderBy(x => x.createTime).OrderByDescending(x => x.createTime).ToList();
                 return Json(list);
             }
-            else if(id == 4)
+            else if (id == 4)
             {
                 var list = _db.Set<Account>().Select(x => new AccountModel
                 {
@@ -116,7 +117,7 @@ namespace TestApi.Controllers
                     isActive = (bool)x.isActive,
                     createTime = (DateTime)x.CreateTime,
                     role = x.Role
-                }).OrderByDescending(x=> x.role).ToList();
+                }).OrderByDescending(x => x.role).ToList();
                 return Json(list);
             }
             return Ok();
