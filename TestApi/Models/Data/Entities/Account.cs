@@ -8,6 +8,7 @@ namespace TestApi.Models.Data.Entities
     public class Account
     {
         public Guid Id { get; set; }
+        public Guid? InventoryId { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Email { get; set; }
@@ -16,7 +17,7 @@ namespace TestApi.Models.Data.Entities
         public string Role { get; set; }
         public DateTime? CreateTime { get; set; }
         public string Image { get; set; }
-
+        public ICollection<Inventory> Inventory { get; set; }
 
         public Account()
         {
