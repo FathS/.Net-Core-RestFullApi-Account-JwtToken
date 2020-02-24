@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -303,6 +304,50 @@ namespace TestApi.Controllers
                 return Ok("Hesap Aktif Edildi.");
             }
 
+        }
+
+        public IActionResult DovizCevir(Guid id, decimal TL, string birim)
+        {
+            if (TL <= 10)
+            {
+                return BadRequest("10 TL ve üzeri girilen miktarlarda dolar alınabilir.");
+            }
+
+            XmlDocument xmlVerisi = new XmlDocument();
+            xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            if (birim == "Dolar")
+            {
+                decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
+                var doviz = TL / Dolar;
+                var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
+
+                if (account == null)
+                {
+                    return BadRequest("Kullanıcı Bulunamadı");
+                }
+                if (account.TL < TL)
+                {
+                    return BadRequest("Hesabınızda Yeterli Tutar Bulunmamaktadır. Hesabınızdaki Tutar:" + account.TL);
+                }
+
+                var kalanTl = account.TL - TL;
+                var dovizMiktar = account.USD + doviz;
+
+                //account.USD += doviz;
+                account.USD = dovizMiktar;
+                account.TL = kalanTl;
+                _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                _db.SaveChanges();
+                var message = TL + "TL 'ye" + " " + doviz + " USD alındı" + "TL Bakiyeniz: " + account.TL + " UDS Bakiyeniz : " + account.USD;
+
+                return Ok(message);
+            }
+            if (birim == "Euro")
+            {
+                decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
+
+            }
+            return Ok();
         }
     }
 }
