@@ -14,7 +14,7 @@ namespace TestApi.DTO
         public string confirmPassword { get; set; }
         public string email { get; set; }
         public bool isActive { get; set; }
-        public DateTime createTime { get; set; }
+        public string createTime { get; set; }
         public string role { get; set; }
         public string age { get; set; }
         public string image { get; set; }

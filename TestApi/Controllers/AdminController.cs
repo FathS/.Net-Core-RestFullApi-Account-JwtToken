@@ -42,7 +42,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role,
                     image = x.Image
                 }).OrderBy(x => x.role).Where(x => x.isActive).ToList();
@@ -58,7 +58,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role
                 }).OrderBy(x => x.role).Where(x => x.isActive == false).ToList();
 
@@ -73,7 +73,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role
                 }).OrderBy(x => x.email).ToList();
                 return Json(list);
@@ -87,7 +87,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role
                 }).OrderBy(x => x.createTime).OrderByDescending(x => x.createTime).ToList();
                 return Json(list);
@@ -101,7 +101,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role
                 }).OrderBy(x => x.role).ToList();
                 return Json(list);
@@ -115,7 +115,7 @@ namespace TestApi.Controllers
                     surname = x.Surname,
                     email = x.Email,
                     isActive = (bool)x.isActive,
-                    createTime = (DateTime)x.CreateTime,
+                    createTime = x.CreateTime,
                     role = x.Role
                 }).OrderByDescending(x => x.role).ToList();
                 return Json(list);

@@ -11,6 +11,8 @@ namespace TestApi.Models.Data
         DbSet<Manager> Manager { get; set; }
         DbSet<Account> Account { get; set; }
         DbSet<UserPassword> UserPassword { get; set; }
+        DbSet<Balance> Balance { get; set; }
+
 
         public PersonelContext(DbContextOptions<PersonelContext> option) : base(option)
         {

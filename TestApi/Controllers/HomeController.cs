@@ -179,7 +179,6 @@ namespace TestApi.Controllers
                     Name = model.Name,
                     Surname = model.Surname,
                     Age = model.Age,
-                    CreateTime = DateTime.Now,
                     Email = model.Email,
                     isActive = true,
 

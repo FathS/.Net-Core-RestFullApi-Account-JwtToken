@@ -14,15 +14,17 @@ namespace TestApi.Models.Data.Entities
         public string Age { get; set; }
         public bool? isActive { get; set; }
         public string Role { get; set; }
-        public DateTime? CreateTime { get; set; }
+        public string CreateTime { get; set; }
         public string Image { get; set; }
         public ICollection<Inventory> Inventory { get; set; }
+        public ICollection<Balance> Balance { get; set; }
         public decimal TL { get; set; }
         public decimal USD { get; set; }
+        public decimal EURO { get; set; }
 
         public Account()
         {
-            CreateTime = DateTime.Now.Date;
+            CreateTime = DateTime.Now.ToLongDateString() + DateTime.Now.ToShortTimeString();
         }
     }
 

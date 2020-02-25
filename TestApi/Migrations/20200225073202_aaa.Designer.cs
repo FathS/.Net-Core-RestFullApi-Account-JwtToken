@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestApi.Models.Data;
 
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    partial class PersonelContextModelSnapshot : ModelSnapshot
+    [Migration("20200225073202_aaa")]
+    partial class aaa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,8 +61,6 @@ namespace TestApi.Migrations
 
                     b.Property<Guid?>("AccountId");
 
-                    b.Property<decimal>("BuyTL");
-
                     b.Property<decimal>("BuyUSD");
 
                     b.Property<decimal>("DolarKur");
@@ -69,11 +69,7 @@ namespace TestApi.Migrations
 
                     b.Property<string>("OperationTime");
 
-                    b.Property<decimal>("SellEURO");
-
                     b.Property<decimal>("SellTL");
-
-                    b.Property<decimal>("SellUSD");
 
                     b.HasKey("Id");
 

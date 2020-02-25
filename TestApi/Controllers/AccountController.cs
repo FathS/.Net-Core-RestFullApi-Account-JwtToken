@@ -110,7 +110,6 @@ namespace TestApi.Controllers
                     Name = model.Name,
                     Surname = model.Surname.ToUpperInvariant(),
                     Age = model.Age,
-                    CreateTime = DateTime.Now,
                     Email = model.Email,
                     isActive = model.isActive,
                     Role = Defaultrole
@@ -308,7 +307,7 @@ namespace TestApi.Controllers
 
         public IActionResult DovizCevir(Guid id, decimal TL, string birim)
         {
-            if (TL <= 10)
+            if (TL < 10)
             {
                 return BadRequest("10 TL ve üzeri girilen miktarlarda dolar alınabilir.");
             }
@@ -337,17 +336,193 @@ namespace TestApi.Controllers
                 account.USD = dovizMiktar;
                 account.TL = kalanTl;
                 _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                var balance = new Balance
+                {
+                    AccountId = id,
+                    BuyUSD = doviz,
+                    SellTL = TL,
+                    OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
+                    DolarKur = Dolar
+                };
+                _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                 _db.SaveChanges();
-                var message = TL + "TL 'ye" + " " + doviz + " USD alındı" + "TL Bakiyeniz: " + account.TL + " UDS Bakiyeniz : " + account.USD;
+                var message = "Hesap Bilgisi:" + " " + TL + "TL 'ye" + " " + doviz + " USD alındı. " + "TL Bakiyeniz: " + account.TL + " UDS Bakiyeniz : " + account.USD;
 
                 return Ok(message);
             }
             if (birim == "Euro")
             {
                 decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
+                var doviz = TL / Euro;
+                var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
+                if (account == null)
+                {
+                    return BadRequest("Kullanıcı Bulunamadı");
+                }
+                if (account.TL < TL)
+                {
+                    return BadRequest("Hesabınızda Yeterli Tutar Bulunmamaktadır. Hesabınızdaki Tutar:" + account.TL);
+                }
+
+                var kalanTl = account.TL - TL;
+                var dovizMiktar = account.EURO + doviz;
+
+                //account.USD += doviz;
+                account.EURO = dovizMiktar;
+                account.TL = kalanTl;
+                _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                var balance = new Balance
+                {
+                    AccountId = id,
+                    BuyUSD = doviz,
+                    SellTL = TL,
+                    OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
+                    EuroKur = Euro
+                };
+                _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _db.SaveChanges();
+                var message = "Hesap Bilgisi:" + " " + TL + "TL 'ye" + " " + doviz + " EURO alındı. " + "TL Bakiyeniz: " + account.TL + " EURO Bakiyeniz : " + account.EURO;
+
+                return Ok(message);
             }
             return Ok();
         }
+
+        public IActionResult DovizSat(Guid id, decimal döviz, string birim)
+        {
+            if (Guid.Empty == id)
+            {
+                return BadRequest("Kullanıcı Bulunamadı");
+            }
+            if (string.IsNullOrEmpty(birim))
+            {
+                return BadRequest("Bozdurmak istediğiniz Dövizi Seçmeniz Gerekmektedir.");
+            }
+            if (döviz < 2 && birim == "Dolar")
+            {
+                return BadRequest("En az 2 Dolar Bozdurabilirsiniz");
+            }
+            if (döviz < 2 && birim == "Euro")
+            {
+                return BadRequest("En az 2 Euro Bozdurabilirsiniz");
+            }
+
+            XmlDocument xmlVerisi = new XmlDocument();
+            xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            if (birim == "Dolar")
+            {
+                decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
+
+                var bozdurulan = döviz * Dolar;
+
+                var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
+
+                if (account == null)
+                {
+                    return BadRequest("Hesap Bulunamadı");
+                }
+                if (account.USD < döviz)
+                {
+                    return BadRequest("Hesabınızda Girdiğiniz değer kadar dolar bulunmamaktadır. Lütfen Bakiyenizi Kontrol edip tekrar deneyiniz.");
+                }
+                var kalanDoviz = account.USD - döviz;
+                var kalanTl = account.TL + bozdurulan;
+
+                account.USD = kalanDoviz;
+                account.TL = kalanTl;
+
+                _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+                var balance = new Balance
+                {
+                    AccountId = id,
+                    DolarKur = Dolar,
+                    OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
+                    BuyTL = bozdurulan,
+                    SellUSD = döviz,
+                };
+                _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _db.SaveChanges();
+                return Ok(döviz + " " + birim + " " + bozdurulan + " TL Parasına Çevirildi.");
+            }
+            if (birim == "Euro")
+            {
+                decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
+                var bozdurulan = döviz * Euro;
+
+                var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
+
+                if (account == null)
+                {
+                    return BadRequest("Hesap Bulunamadı");
+                }
+                if (account.EURO < döviz)
+                {
+                    return BadRequest("Hesabınızda Girdiğiniz değer kadar Euro bulunmamaktadır. Lütfen Bakiyenizi Kontrol edip tekrar deneyiniz.");
+                }
+                var kalanDoviz = account.EURO - döviz;
+                var kalanTl = account.TL + bozdurulan;
+
+                account.EURO = kalanDoviz;
+                account.TL = kalanTl;
+
+                _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+                var balance = new Balance
+                {
+                    AccountId = id,
+                    EuroKur = Euro,
+                    OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
+                    BuyTL = bozdurulan,
+                    SellEURO = döviz
+
+                };
+                _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _db.SaveChanges();
+                return Ok(döviz + " " + birim + " " + bozdurulan + " TL Parasına Çevirildi.");
+            }
+
+            return Ok();
+        }
+
+        public IActionResult getBakiye(Guid id)
+        {
+            var userbakiye = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
+
+            var model = new bakiyeModel
+            {
+                tl = userbakiye.TL,
+                usd = userbakiye.USD,
+                euro = userbakiye.EURO
+            };
+
+            return Ok(model);
+        }
+        public IActionResult getHesapHareket(Guid id)
+        {
+            var hareketList = _db.Set<Balance>().Where(x => x.AccountId == id).Select(x => new balanceListModel
+            {
+                user = x.Account.Name + " " + x.Account.Surname,
+                buyUsd = x.BuyUSD,
+                sellTl = x.SellTL,
+                date = x.OperationTime,
+                dolarKur = x.DolarKur,
+                euroKur = x.EuroKur,
+                buyTl = x.BuyTL,
+                selleuro = x.SellEURO,
+                sellUsd = x.SellUSD
+            }).ToList();
+
+            if (hareketList.Count == 0)
+            {
+                return BadRequest("Hesap Hareketi Bulunamadı");
+            }
+
+            return Ok(hareketList);
+        }
+
+
+
     }
 }
