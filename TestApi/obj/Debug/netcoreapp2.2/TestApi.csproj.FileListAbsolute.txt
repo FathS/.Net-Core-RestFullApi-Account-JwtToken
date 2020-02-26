@@ -88,3 +88,4 @@ C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestA
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.dll
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.pdb
 C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csproj.CopyComplete
+C:\Users\is97788\Desktop\BasicApi\BasicApi\TestApi\obj\Debug\netcoreapp2.2\TestApi.csprojAssemblyReference.cache

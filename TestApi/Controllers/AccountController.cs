@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +11,8 @@ using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using QuickType;
 using TestApi.DTO;
 using TestApi.Helpers;
 using TestApi.Models.Data;
@@ -312,12 +316,18 @@ namespace TestApi.Controllers
                 return BadRequest("10 TL ve üzeri girilen miktarlarda dolar alınabilir.");
             }
 
-            XmlDocument xmlVerisi = new XmlDocument();
-            xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            //XmlDocument xmlVerisi = new XmlDocument();
+            //xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            string adres = "https://finans.truncgil.com/today.json";
+            WebRequest istek = HttpWebRequest.Create(adres); // istek yolladık
+            WebResponse cevap = istek.GetResponse(); // cevabı aldık
+            StreamReader donenBilgiler = new StreamReader(cevap.GetResponseStream()); // cevabı okuduk
+            string bilgilerial = donenBilgiler.ReadToEnd(); // okuduğumuz cevabı stringe atadık
+            dövizNewModel veriler = JsonConvert.DeserializeObject<dövizNewModel>(bilgilerial);
             if (birim == "Dolar")
             {
-                decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
-                var doviz = TL / Dolar;
+                //decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
+                var doviz = TL / decimal.Parse(veriler.AbdDolari.Satış.Replace('.', ','));
                 var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
                 if (account == null)
@@ -342,7 +352,7 @@ namespace TestApi.Controllers
                     BuyUSD = doviz,
                     SellTL = TL,
                     OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
-                    DolarKur = Dolar
+                    DolarKur = decimal.Parse(veriler.AbdDolari.Satış.Replace('.', ','))
                 };
                 _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                 _db.SaveChanges();
@@ -352,8 +362,8 @@ namespace TestApi.Controllers
             }
             if (birim == "Euro")
             {
-                decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
-                var doviz = TL / Euro;
+                //decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
+                var doviz = TL / decimal.Parse(veriler.Euro.Satış.Replace('.', ','));
                 var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
                 if (account == null)
@@ -378,7 +388,7 @@ namespace TestApi.Controllers
                     BuyUSD = doviz,
                     SellTL = TL,
                     OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
-                    EuroKur = Euro
+                    EuroKur = decimal.Parse(veriler.Euro.Satış.Replace('.', ','))
                 };
                 _db.Entry(balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
                 _db.SaveChanges();
@@ -408,13 +418,19 @@ namespace TestApi.Controllers
                 return BadRequest("En az 2 Euro Bozdurabilirsiniz");
             }
 
-            XmlDocument xmlVerisi = new XmlDocument();
-            xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            //XmlDocument xmlVerisi = new XmlDocument();
+            //xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
+            string adres = "https://finans.truncgil.com/today.json";
+            WebRequest istek = HttpWebRequest.Create(adres); // istek yolladık
+            WebResponse cevap = istek.GetResponse(); // cevabı aldık
+            StreamReader donenBilgiler = new StreamReader(cevap.GetResponseStream()); // cevabı okuduk
+            string bilgilerial = donenBilgiler.ReadToEnd(); // okuduğumuz cevabı stringe atadık
+            dövizNewModel veriler = JsonConvert.DeserializeObject<dövizNewModel>(bilgilerial);
             if (birim == "Dolar")
             {
-                decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
+                //decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
 
-                var bozdurulan = döviz * Dolar;
+                var bozdurulan = döviz * decimal.Parse(veriler.AbdDolari.Alış.Replace('.', ','));
 
                 var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
@@ -437,7 +453,7 @@ namespace TestApi.Controllers
                 var balance = new Balance
                 {
                     AccountId = id,
-                    DolarKur = Dolar,
+                    DolarKur = decimal.Parse(veriler.AbdDolari.Alış.Replace('.', ',')),
                     OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
                     BuyTL = bozdurulan,
                     SellUSD = döviz,
@@ -448,8 +464,8 @@ namespace TestApi.Controllers
             }
             if (birim == "Euro")
             {
-                decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
-                var bozdurulan = döviz * Euro;
+                //decimal Euro = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "EUR")).InnerText.Replace('.', ','));
+                var bozdurulan = döviz * decimal.Parse(veriler.Euro.Alış.Replace('.', ','));
 
                 var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
 
@@ -472,7 +488,7 @@ namespace TestApi.Controllers
                 var balance = new Balance
                 {
                     AccountId = id,
-                    EuroKur = Euro,
+                    EuroKur = decimal.Parse(veriler.Euro.Alış.Replace('.', ',')),
                     OperationTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToShortTimeString(),
                     BuyTL = bozdurulan,
                     SellEURO = döviz
