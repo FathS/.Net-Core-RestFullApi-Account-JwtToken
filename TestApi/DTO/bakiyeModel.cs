@@ -10,5 +10,6 @@ namespace TestApi.DTO
         public decimal tl { get; set; }
         public decimal usd { get; set; }
         public decimal euro { get; set; }
+        public decimal altin { get; set; }
     }
 }

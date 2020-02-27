@@ -11,12 +11,15 @@ namespace TestApi.Models.Data.Entities
         public Guid? AccountId { get; set; }
         public decimal BuyUSD { get; set; }
         public decimal BuyTL { get; set; }
+        public decimal BuyAltin { get; set; }
         public decimal SellTL { get; set; }
         public decimal SellUSD { get; set; }
         public decimal SellEURO { get; set; }
+        public decimal SellAltin { get; set; }
         public string OperationTime { get; set; }
         public decimal DolarKur { get; set; }
         public decimal EuroKur { get; set; }
+        public decimal AltinKur { get; set; }
         public virtual Account Account { get; set; }
 
         

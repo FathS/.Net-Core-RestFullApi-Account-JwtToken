@@ -35,7 +35,7 @@ namespace TestApi.Controllers
                 euro = veriler.Euro.Satış,
                 dolarAlis = veriler.AbdDolari.Alış,
                 euroAlis = veriler.Euro.Alış,
-                altin = veriler.GramAltın.Satış,
+                altin = Decimal.Parse(veriler.GramAltın.Satış.Replace(".", ",")),
                 altinAlis = veriler.GramAltın.Alış
 
             };

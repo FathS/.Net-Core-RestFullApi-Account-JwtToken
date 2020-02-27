@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TestApi.Models.Data;
 
 namespace TestApi.Migrations
 {
     [DbContext(typeof(PersonelContext))]
-    partial class PersonelContextModelSnapshot : ModelSnapshot
+    [Migration("20200227060713_Altin")]
+    partial class Altin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,8 +27,6 @@ namespace TestApi.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Age");
-
-                    b.Property<decimal>("AltinGr");
 
                     b.Property<string>("CreateTime");
 

@@ -11,7 +11,7 @@ namespace TestApi.DTO
         public string euro { get; set; }
         public string dolarAlis { get; set; }
         public string euroAlis { get; set; }
-        public string altin { get; set; }
+        public decimal altin { get; set; }
         public string altinAlis { get; set; }
         public DateTime date { get; set; }
         public DateTimeOffset updatekur { get; set; }

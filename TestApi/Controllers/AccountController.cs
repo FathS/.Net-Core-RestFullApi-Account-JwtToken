@@ -311,11 +311,6 @@ namespace TestApi.Controllers
 
         public IActionResult DovizCevir(Guid id, decimal TL, string birim)
         {
-            if (TL < 10)
-            {
-                return BadRequest("10 TL ve üzeri girilen miktarlarda dolar alınabilir.");
-            }
-
             //XmlDocument xmlVerisi = new XmlDocument();
             //xmlVerisi.Load("http://www.tcmb.gov.tr/kurlar/today.xml");
             string adres = "https://finans.truncgil.com/today.json";
@@ -326,6 +321,10 @@ namespace TestApi.Controllers
             dövizNewModel veriler = JsonConvert.DeserializeObject<dövizNewModel>(bilgilerial);
             if (birim == "Dolar")
             {
+                if (TL < 10)
+                {
+                    return BadRequest("10 TL ve üzeri girilen miktarlarda dolar alınabilir.");
+                }
                 //decimal Dolar = Convert.ToDecimal(xmlVerisi.SelectSingleNode(string.Format("Tarih_Date/Currency[@Kod='{0}']/ForexSelling", "USD")).InnerText.Replace('.', ','));
                 var doviz = TL / decimal.Parse(veriler.AbdDolari.Satış.Replace('.', ','));
                 var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
@@ -395,6 +394,37 @@ namespace TestApi.Controllers
                 var message = "Hesap Bilgisi:" + " " + TL + "TL 'ye" + " " + doviz + " EURO alındı. " + "TL Bakiyeniz: " + account.TL + " EURO Bakiyeniz : " + account.EURO;
 
                 return Ok(message);
+            }
+            if (birim == "Altin")
+            {
+                if (TL < 1)
+                {
+                    return BadRequest("En az 1 gram altın alabilirsiniz");
+                }
+                var alinanAltin = Decimal.Parse(veriler.GramAltın.Satış.Replace(".", ",")) * TL;
+                var account = _db.Set<Account>().FirstOrDefault(x => x.Id == id);
+                if (account.TL < alinanAltin)
+                {
+                    return BadRequest("Yetersiz Bakiye. Almak istediğiniz altın tutarı " + alinanAltin + " TL'dir");
+                }
+                var kalanTl = account.TL - alinanAltin;
+                var altin = account.AltinGr + TL; //USD YERİNE ALTIN GELECEK
+
+                account.TL = kalanTl;
+                account.AltinGr = altin; //USD yazan yere altın gelecek
+                _db.Entry(account).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+                var Balance = new Balance
+                {
+                    AccountId = id,
+                    SellTL = alinanAltin,
+                    OperationTime = DateTime.Now.ToLongDateString() + DateTime.Now.ToShortTimeString(),
+                    AltinKur = Decimal.Parse(veriler.GramAltın.Satış.Replace(".", ",")),
+                    BuyAltin = TL,
+                };
+                _db.Entry(Balance).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+                _db.SaveChanges();
+                return Ok("Alınan Altın Hesabınıza Aktarılmıştır. Alınan Altın Tutarı : " + TL + " Gram");
             }
             return Ok();
         }
@@ -510,7 +540,8 @@ namespace TestApi.Controllers
             {
                 tl = userbakiye.TL,
                 usd = userbakiye.USD,
-                euro = userbakiye.EURO
+                euro = userbakiye.EURO,
+                altin = userbakiye.AltinGr
             };
 
             return Ok(model);

@@ -21,6 +21,7 @@ namespace TestApi.Models.Data.Entities
         public decimal TL { get; set; }
         public decimal USD { get; set; }
         public decimal EURO { get; set; }
+        public decimal AltinGr { get; set; }
 
         public Account()
         {
