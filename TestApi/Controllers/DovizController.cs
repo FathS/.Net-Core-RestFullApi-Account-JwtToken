@@ -64,7 +64,31 @@ namespace TestApi.Controllers
 
             return Json(veriler);
         }
+        public IActionResult ChartList()
+        {
+            string adres = "https://finans.truncgil.com/today.json";
+            WebRequest istek = HttpWebRequest.Create(adres); // istek yolladık
+            WebResponse cevap = istek.GetResponse(); // cevabı aldık
+            StreamReader donenBilgiler = new StreamReader(cevap.GetResponseStream()); // cevabı okuduk
+            string bilgilerial = donenBilgiler.ReadToEnd(); // okuduğumuz cevabı stringe atadık
+            dövizNewModel veriler = JsonConvert.DeserializeObject<dövizNewModel>(bilgilerial);
 
+            var doviz = new dovizModel
+            {
+                dolar = veriler.AbdDolari.Satış,
+                //euro = veriler.Euro.Satış,
+                //dolarAlis = veriler.AbdDolari.Alış,
+                //euroAlis = veriler.Euro.Alış,
+                //altin = Decimal.Parse(veriler.GramAltın.Satış.Replace(".", ",")),
+                //altinAlis = veriler.GramAltın.Alış
 
+            };
+
+            var DovizList = new List<dovizModel>();
+
+            DovizList.Add(doviz);
+
+            return Ok(DovizList);
+        }
     }
 }

@@ -556,9 +556,13 @@ namespace TestApi.Controllers
                 date = x.OperationTime,
                 dolarKur = x.DolarKur,
                 euroKur = x.EuroKur,
+                altinKur = x.AltinKur,
                 buyTl = x.BuyTL,
+                buyAltin = x.BuyAltin,
                 selleuro = x.SellEURO,
-                sellUsd = x.SellUSD
+                sellUsd = x.SellUSD,
+                sellAltin = x.SellAltin
+
             }).ToList();
 
             if (hareketList.Count == 0)

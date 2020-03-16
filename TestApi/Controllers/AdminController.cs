@@ -164,12 +164,9 @@ namespace TestApi.Controllers
                 return BadRequest("Parola Bulunamadı!");
             }
 
-            var inventory = _db.Set<Inventory>().FirstOrDefault(x => x.AccountId == account.Id);
+            
 
-            if (inventory == null)
-            {
-                return BadRequest("Hesap Bulunamadı!");
-            }
+
 
             var accountModel = new AccountModel
             {
