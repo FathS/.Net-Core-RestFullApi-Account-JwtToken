@@ -12,6 +12,8 @@ namespace TestApi.Models.Data
         DbSet<Account> Account { get; set; }
         DbSet<UserPassword> UserPassword { get; set; }
         DbSet<Balance> Balance { get; set; }
+        DbSet<Products> Product { get; set; }
+        DbSet<Category> Category { get; set; }
 
 
         public PersonelContext(DbContextOptions<PersonelContext> option) : base(option)

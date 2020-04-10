@@ -35,6 +35,8 @@ namespace TestApi.Controllers
         {
             if (id == 1)
             {
+                var total = _db.Set<Account>().Where(x => (bool)x.isActive).Sum(x => x.TL);
+
                 var list = _db.Set<Account>().Select(x => new AccountModel
                 {
                     id = x.Id,
@@ -44,8 +46,13 @@ namespace TestApi.Controllers
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
                     role = x.Role,
-                    image = x.Image
+                    image = x.Image,
+                    bakiye = x.TL,
+                    Total = total
                 }).OrderBy(x => x.role).Where(x => x.isActive).ToList();
+
+
+
 
                 return Json(list);
             }
@@ -59,7 +66,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    bakiye = x.TL
                 }).OrderBy(x => x.role).Where(x => x.isActive == false).ToList();
 
                 return Json(list);
@@ -74,7 +82,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    bakiye = x.TL
                 }).OrderBy(x => x.email).ToList();
                 return Json(list);
             }
@@ -88,7 +97,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    bakiye = x.TL
                 }).OrderBy(x => x.createTime).OrderByDescending(x => x.createTime).ToList();
                 return Json(list);
             }
@@ -102,7 +112,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    bakiye = x.TL
                 }).OrderBy(x => x.role).ToList();
                 return Json(list);
             }
@@ -116,7 +127,8 @@ namespace TestApi.Controllers
                     email = x.Email,
                     isActive = (bool)x.isActive,
                     createTime = x.CreateTime,
-                    role = x.Role
+                    role = x.Role,
+                    bakiye = x.TL
                 }).OrderByDescending(x => x.role).ToList();
                 return Json(list);
             }
@@ -164,7 +176,7 @@ namespace TestApi.Controllers
                 return BadRequest("Parola Bulunamadı!");
             }
 
-            
+
 
 
 

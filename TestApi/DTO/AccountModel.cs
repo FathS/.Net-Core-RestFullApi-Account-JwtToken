@@ -18,5 +18,7 @@ namespace TestApi.DTO
         public string role { get; set; }
         public string age { get; set; }
         public string image { get; set; }
+        public decimal bakiye { get; set; }
+        public decimal Total { get; set; }
     }
 }
